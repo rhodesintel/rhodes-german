@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Rhodes German - FSI-Stil Deutschkurs</title>
+  <style>
+    :root {
+      --primary: #DD0000;
+      --secondary: #FFCC00;
+      --bg-dark: #1a1a2e;
+      --bg-light: #16213e;
+      --text: #ffffff;
+      --success: #28a745;
+      --error: #dc3545;
+      --case-nom: #0066CC;
+      --case-acc: #CC0000;
+      --case-dat: #009900;
+      --case-gen: #CC9900;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-light) 100%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .header {
+      background: rgba(0,0,0,0.3);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.5em;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-flag { font-size: 1.8em; }
+
+    .stats-bar {
+      display: flex;
+      gap: 15px;
+      font-size: 0.9em;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.1);
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Landing Screen */
+    #landing {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    #landing h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #landing .tagline {
+      font-size: 1.2em;
+      opacity: 0.8;
+      margin-bottom: 30px;
+    }
+
+    .mode-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 400px;
+      margin: 30px auto;
+    }
+
+    .btn {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #AA0000);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary), #DDAA00);
+      color: #1a1a2e;
+    }
+
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+    .btn:active { transform: scale(0.98); }
+
+    /* Unit Selection */
+    #unit-select {
+      display: none;
+    }
+
+    .unit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .unit-card {
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .unit-card:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    .unit-card.completed {
+      border: 2px solid var(--success);
+    }
+
+    .unit-number {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: var(--secondary);
+    }
+
+    .unit-title {
+      font-size: 0.8em;
+      opacity: 0.8;
+      margin-top: 5px;
+    }
+
+    /* Drill Screen */
+    #drill-screen {
+      display: none;
+    }
+
+    .drill-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transition: width 0.3s;
+    }
+
+    .drill-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+
+    .drill-type {
+      font-size: 0.9em;
+      color: var(--secondary);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .prompt {
+      font-size: 1.4em;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .prompt .english {
+      color: #aaa;
+      font-size: 0.85em;
+      margin-top: 10px;
+    }
+
+    .input-area {
+      margin-bottom: 20px;
+    }
+
+    #answer-input {
+      width: 100%;
+      padding: 15px;
+      font-size: 1.2em;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.3);
+      color: white;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #answer-input:focus {
+      border-color: var(--secondary);
+    }
+
+    #answer-input.correct {
+      border-color: var(--success);
+      background: rgba(40, 167, 69, 0.2);
+    }
+
+    #answer-input.incorrect {
+      border-color: var(--error);
+      background: rgba(220, 53, 69, 0.2);
+    }
+
+    .feedback {
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .feedback.show { display: block; }
+
+    .feedback.correct {
+      background: rgba(40, 167, 69, 0.2);
+      border: 1px solid var(--success);
+    }
+
+    .feedback.incorrect {
+      background: rgba(220, 53, 69, 0.2);
+      border: 1px solid var(--error);
+    }
+
+    .expected-answer {
+      font-family: monospace;
+      font-size: 1.1em;
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 5px;
+    }
+
+    /* Register Toggle */
+    .register-toggle {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .register-btn {
+      padding: 8px 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      background: transparent;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .register-btn.active {
+      background: var(--secondary);
+      color: #1a1a2e;
+      border-color: var(--secondary);
+    }
+
+    /* Case Color Legend */
+    .case-legend {
+      display: flex;
+      gap: 15px;
+      font-size: 0.8em;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .case-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .case-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .case-nom { background: var(--case-nom); }
+    .case-acc { background: var(--case-acc); }
+    .case-dat { background: var(--case-dat); }
+    .case-gen { background: var(--case-gen); }
+
+    /* Stats Screen */
+    #stats-screen {
+      display: none;
+    }
+
+    .stats-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .stats-title {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      color: var(--secondary);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .stats-item {
+      text-align: center;
+    }
+
+    .stats-value {
+      font-size: 2em;
+      font-weight: bold;
+    }
+
+    .stats-label {
+      font-size: 0.9em;
+      opacity: 0.7;
+    }
+
+    /* Back Button */
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.5em;
+      cursor: pointer;
+      padding: 10px;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top-color: var(--secondary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .header { padding: 10px 15px; }
+      .logo { font-size: 1.2em; }
+      .stats-bar { display: none; }
+      .container { padding: 15px; }
+      #landing h1 { font-size: 2em; }
+      .drill-card { padding: 20px; }
+      .prompt { font-size: 1.2em; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-flag">🇩🇪</span>
+      <span>Rhodes German</span>
+    </div>
+    <div class="stats-bar">
+      <span class="stat" id="streak-display">🔥 0</span>
+      <span class="stat" id="due-display">📚 0 due</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Landing Screen -->
+    <section id="landing">
+      <h1>Rhodes German</h1>
+      <p class="tagline">Das Beste Deutschkurs aller Zeiten<br>1,589 Drills • FSI-Methodik • FSRS SRS</p>
+
+      <div class="mode-buttons">
+        <button class="btn btn-primary" onclick="startSRS()">
+          🧠 SRS-Modus (Intelligente Wiederholung)
+        </button>
+        <button class="btn btn-secondary" onclick="showUnitSelect()">
+          📖 Linear-Modus (Unit für Unit)
+        </button>
+        <button class="btn btn-secondary" onclick="showStats()">
+          📊 Statistiken
+        </button>
+      </div>
+
+      <div class="case-legend" style="justify-content: center; margin-top: 30px;">
+        <div class="case-item"><span class="case-dot case-nom"></span> Nominativ</div>
+        <div class="case-item"><span class="case-dot case-acc"></span> Akkusativ</div>
+        <div class="case-item"><span class="case-dot case-dat"></span> Dativ</div>
+        <div class="case-item"><span class="case-dot case-gen"></span> Genitiv</div>
+      </div>
+    </section>
+
+    <!-- Unit Selection -->
+    <section id="unit-select">
+      <div class="drill-header">
+        <button class="back-btn" onclick="showLanding()">←</button>
+        <h2>Einheit auswählen</h2>
+        <div></div>
+      </div>
+      <div class="unit-grid" id="unit-grid"></div>
+    </section>
+
+    <!-- Drill Screen -->
+    <section id="drill-screen">
+      <div class="drill-header">
+        <button class="back-btn" onclick="exitDrill()">←</button>
+        <span id="drill-unit-title">Einheit 1</span>
+        <span id="drill-counter">1/50</span>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+      </div>
+
+      <div class="register-toggle">
+        <button class="register-btn active" id="btn-formal" onclick="setRegister('formal')">Sie (formal)</button>
+        <button class="register-btn" id="btn-informal" onclick="setRegister('informal')">du (informal)</button>
+      </div>
+
+      <div class="drill-card">
+        <div class="drill-type" id="drill-type">Übersetzung</div>
+        <div class="prompt" id="prompt">
+          <div class="english" id="prompt-english">Loading...</div>
+        </div>
+
+        <div class="input-area">
+          <input type="text" id="answer-input" placeholder="Schreiben Sie auf Deutsch..." autocomplete="off" autocapitalize="off" spellcheck="false">
+        </div>
+
+        <div class="feedback" id="feedback">
+          <div id="feedback-text"></div>
+          <div class="expected-answer" id="expected-answer"></div>
+        </div>
+
+        <button class="btn btn-primary" id="submit-btn" onclick="checkAnswer()" style="width: 100%;">
+          Prüfen
+        </button>
+      </div>
+    </section>
+
+    <!-- Stats Screen -->
+    <section id="stats-screen">
+      <div class="drill-header">
+        <button class="back-btn" onclick="showLanding()">←</button>
+        <h2>Statistiken</h2>
+        <div></div>
+      </div>
+
+      <div class="stats-card">
+        <div class="stats-title">Fortschritt</div>
+        <div class="stats-grid">
+          <div class="stats-item">
+            <div class="stats-value" id="stats-total">0</div>
+            <div class="stats-label">Gesamt gelernt</div>
+          </div>
+          <div class="stats-item">
+            <div class="stats-value" id="stats-mastered">0</div>
+            <div class="stats-label">Gemeistert</div>
+          </div>
+          <div class="stats-item">
+            <div class="stats-value" id="stats-due">0</div>
+            <div class="stats-label">Heute fällig</div>
+          </div>
+          <div class="stats-item">
+            <div class="stats-value" id="stats-accuracy">0%</div>
+            <div class="stats-label">Genauigkeit</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-card">
+        <div class="stats-title">Sitzung</div>
+        <div class="stats-grid">
+          <div class="stats-item">
+            <div class="stats-value" id="session-reviewed">0</div>
+            <div class="stats-label">Geprüft</div>
+          </div>
+          <div class="stats-item">
+            <div class="stats-value" id="session-correct">0</div>
+            <div class="stats-label">Richtig</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary" onclick="resetProgress()" style="width: 100%; margin-top: 20px;">
+        🗑️ Fortschritt zurücksetzen
+      </button>
+    </section>
+
+    <!-- Loading -->
+    <section id="loading" style="display: none;">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Lade Drills...</p>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/fsi-srs.js"></script>
+  <script src="js/german-main.js"></script>
+</body>
+</html>

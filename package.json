@@ -1,0 +1,33 @@
+{
+  "name": "rhodes-german",
+  "version": "1.0.0",
+  "description": "Rhodes German - The Best FSI-Style German Course",
+  "main": "www/index.html",
+  "scripts": {
+    "start": "npx serve www",
+    "build": "echo 'No build required - static site'",
+    "test": "echo 'Open www/index.html in browser'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rhodesintel/rhodes-german.git"
+  },
+  "keywords": [
+    "german",
+    "language-learning",
+    "fsi",
+    "spaced-repetition",
+    "fsrs",
+    "deutsch"
+  ],
+  "author": "AHGI Alliance",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rhodesintel/rhodes-german/issues"
+  },
+  "homepage": "https://rhodesintel.github.io/rhodes-german/",
+  "dependencies": {},
+  "devDependencies": {
+    "serve": "^14.0.0"
+  }
+}
