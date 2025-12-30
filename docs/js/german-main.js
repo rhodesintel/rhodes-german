@@ -173,6 +173,7 @@ let currentUnit = null;
 let currentDrillIndex = 0;
 let currentDrills = [];
 let register = 'formal';  // 'formal' (Sie) or 'informal' (du)
+let drillDirection = 'en-de';  // 'en-de' (English→German) or 'de-en' (German→English)
 let sessionCorrect = 0;
 let sessionTotal = 0;
 
@@ -372,8 +373,18 @@ function loadNextDrill() {
   };
   document.getElementById('drill-type').textContent = typeMap[currentDrill.type] || 'Übung';
 
-  // Set prompt (English)
-  document.getElementById('prompt-english').textContent = currentDrill.english || 'Translate to German:';
+  // Set prompt based on direction
+  const promptEl = document.getElementById('prompt-english');
+  if (drillDirection === 'de-en') {
+    // German→English: Show German, expect English
+    const germanText = register === 'formal' ? currentDrill.german_formal : currentDrill.german_informal;
+    promptEl.textContent = germanText || 'Übersetzen Sie ins Englische:';
+    // Auto-play German audio
+    TTS.speak(germanText);
+  } else {
+    // English→German: Show English, expect German
+    promptEl.textContent = currentDrill.english || 'Translate to German:';
+  }
 
   // Clear input and feedback
   const input = document.getElementById('answer-input');
@@ -394,10 +405,17 @@ function checkAnswer() {
 
   if (!userAnswer) return;
 
-  // Get expected answer based on register
-  const expected = register === 'formal'
-    ? currentDrill.german_formal
-    : currentDrill.german_informal;
+  // Get expected answer based on direction and register
+  let expected;
+  if (drillDirection === 'de-en') {
+    // German→English: expect English answer
+    expected = currentDrill.english;
+  } else {
+    // English→German: expect German answer
+    expected = register === 'formal'
+      ? currentDrill.german_formal
+      : currentDrill.german_informal;
+  }
 
   // Normalize for comparison
   const normalize = (s) => s.toLowerCase()
@@ -420,8 +438,14 @@ function checkAnswer() {
     expectedAnswer.textContent = '';
     sessionCorrect++;
 
-    // TTS: speak the correct German
-    TTS.speak(expected);
+    // TTS: speak the correct answer (German for both modes)
+    if (drillDirection === 'de-en') {
+      // Already played German, speak it again on success
+      const germanText = register === 'formal' ? currentDrill.german_formal : currentDrill.german_informal;
+      TTS.speak(germanText);
+    } else {
+      TTS.speak(expected);
+    }
 
     // SRS: process as correct
     if (currentMode === 'srs') {
@@ -461,6 +485,24 @@ function setRegister(reg) {
   register = reg;
   document.getElementById('btn-formal').className = reg === 'formal' ? 'register-btn active' : 'register-btn';
   document.getElementById('btn-informal').className = reg === 'informal' ? 'register-btn active' : 'register-btn';
+}
+
+// ===========================================
+// DIRECTION TOGGLE (EN→DE / DE→EN)
+// ===========================================
+
+function setDirection(dir) {
+  drillDirection = dir;
+  const btnEnDe = document.getElementById('btn-en-de');
+  const btnDeEn = document.getElementById('btn-de-en');
+  if (btnEnDe) btnEnDe.className = dir === 'en-de' ? 'direction-btn active' : 'direction-btn';
+  if (btnDeEn) btnDeEn.className = dir === 'de-en' ? 'direction-btn active' : 'direction-btn';
+
+  // Update placeholder text
+  const input = document.getElementById('answer-input');
+  if (input) {
+    input.placeholder = dir === 'de-en' ? 'Type English translation...' : 'Deutsche Antwort eingeben...';
+  }
 }
 
 // ===========================================
